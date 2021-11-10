@@ -21,7 +21,7 @@ namespace MVC_BlogProject.Controllers
 
         public IActionResult Index()
         {
-            return View(_db.Users.First());
+            return View();
         }
 
         public IActionResult Privacy()

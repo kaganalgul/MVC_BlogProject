@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using MVC_BlogProject.Models.Data;
+using MVC_BlogProject.Models.Entity;
 using MVC_BlogProject.ViewModels.Auth.Login;
 using MVC_BlogProject.ViewModels.Auth.Register;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MVC_BlogProject.Controllers
@@ -18,12 +21,12 @@ namespace MVC_BlogProject.Controllers
             _db = db;
         }
 
-        public IActionResult Index()
+        public IActionResult Login()
         {
             return View();
         }
 
-        public IActionResult Login()
+        public IActionResult Profile()
         {
             return View();
         }
@@ -36,6 +39,7 @@ namespace MVC_BlogProject.Controllers
             {
                 if (_db.Users.Any(x => x.Username.Equals(user.Username) && x.Password.Equals(user.Password)))
                 {
+                    HttpContext.Session.SetString("user", user.Username);
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -46,24 +50,39 @@ namespace MVC_BlogProject.Controllers
             return View();
         }
 
+        public IActionResult LogOut()
+        {
+            HttpContext.Session.Remove("user");
+            return RedirectToAction("Login", "Auth");
+        }
+
         public IActionResult Register()
         {
             return View();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Register(RegisterViewModel user)
         {
             if (ModelState.IsValid)
             {
+                Regex r = new Regex(@"^[a - zA - Z]\w{ 8, 14 }$");
                 if (_db.Users.Any(x => x.Username.Equals(user.Username)))
                 {
                     ModelState.AddModelError("", "There is already a person has same Username");
                 }
+                else if (!r.IsMatch(user.Password))
+                {
+                    ModelState.AddModelError("", "Your password is not compatible with necessary requirements.");
+                }
                 else
                 {
-                    _db.Add(user);
+                    var newUser = new User() { Username = user.Username, Password = user.Password };
+                    _db.Add(newUser);
                     _db.SaveChanges();
-                    return RedirectToAction("Index", "Home");
+                    TempData["message"] = "Register was succesful";
+                    return RedirectToAction("Login", "Auth");
                 }
             }
             return View();

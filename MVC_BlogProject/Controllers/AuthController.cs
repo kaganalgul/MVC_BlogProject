@@ -26,25 +26,24 @@ namespace MVC_BlogProject.Controllers
             return View();
         }
 
-        public IActionResult Profile()
-        {
-            return View();
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(LoginViewModel user)
+        public IActionResult Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                if (_db.Users.Any(x => x.Username.Equals(user.Username) && x.Password.Equals(user.Password)))
+                var user = _db.Users.FirstOrDefault(x => x.Username.Equals(model.Username) && x.Password.Equals(model.Password));
+
+                if (user is not null)
                 {
-                    HttpContext.Session.SetString("user", user.Username);
+                    HttpContext.Session.SetString("userId", user.Id.ToString());
+                    HttpContext.Session.SetString("username", user.Username.ToString());
+                    
                     return RedirectToAction("Index", "Home");
                 }
                 else
                 {
-                    ModelState.AddModelError("", "There is no user with same Username or Username and Password can not be matched");
+                    ModelState.AddModelError("", "User name or password is wrong");
                 }
             }
             return View();

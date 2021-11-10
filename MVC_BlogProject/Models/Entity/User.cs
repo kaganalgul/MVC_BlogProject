@@ -16,9 +16,7 @@ namespace MVC_BlogProject.Models.Entity
         
         [Required]
         public string Username { get; set; }
-
-        [Required]
-        //[RegularExpression(@"^[a-zA-Z]\w{3,14}$", ErrorMessage = "...1")]
+        
         public string Password { get; set; }
     }
 }

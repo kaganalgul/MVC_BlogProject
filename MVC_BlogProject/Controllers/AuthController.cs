@@ -21,14 +21,16 @@ namespace MVC_BlogProject.Controllers
             _db = db;
         }
 
-        public IActionResult Login()
+        [HttpGet]
+        public IActionResult Login(string yonlen)
         {
+            ViewBag.yonlen = yonlen;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(LoginViewModel model)
+        public IActionResult Login(LoginViewModel model, string yonlen)
         {
             if (ModelState.IsValid)
             {
@@ -38,8 +40,15 @@ namespace MVC_BlogProject.Controllers
                 {
                     HttpContext.Session.SetString("userId", user.Id.ToString());
                     HttpContext.Session.SetString("username", user.Username.ToString());
-                    
-                    return RedirectToAction("Index", "Home");
+
+                    if (string.IsNullOrEmpty(yonlen))
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        return Redirect(yonlen);
+                    }
                 }
                 else
                 {
@@ -51,7 +60,8 @@ namespace MVC_BlogProject.Controllers
 
         public IActionResult LogOut()
         {
-            HttpContext.Session.Remove("user");
+            HttpContext.Session.Remove("userId");
+            HttpContext.Session.Remove("username");
             return RedirectToAction("Login", "Auth");
         }
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MVC_BlogProject.Managers;
+using MVC_BlogProject.Filters;
 using MVC_BlogProject.Models.Data;
 using MVC_BlogProject.Models.Entity;
 using MVC_BlogProject.ViewModels.Article.Create;
@@ -22,6 +23,8 @@ namespace MVC_BlogProject.Controllers
             _fileManager = new FileManager(webHostEnvironment);
             _db = context;
         }
+
+        [LoggedUser]
         public IActionResult Create()
         {
             return View();
@@ -44,7 +47,7 @@ namespace MVC_BlogProject.Controllers
                 _db.SaveChanges();
             }
             TempData["message"] = "Tebrikler Article Oluşturma Başarılı.";
-            return RedirectToAction("Profile", "Home");
+            return RedirectToAction("Profile", "Home", new { username = HttpContext.Session.GetString("username") });
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MVC_BlogProject.Filters;
 using MVC_BlogProject.Models;
 using MVC_BlogProject.Models.Data;
 using MVC_BlogProject.ViewModels.Home.Profile;
@@ -26,16 +27,18 @@ namespace MVC_BlogProject.Controllers
             return View();
         }
 
+        [LoggedUser]
         public IActionResult Privacy()
         {
             return View();
         }
 
-        public IActionResult Profile()
+        [HttpGet("[action]/{username}")]
+        public IActionResult Profile(string username)
         {
             List<ArticleViewModel> list =
                 _db.Articles
-                .Where(x => x.AuthorId.ToString().Equals(HttpContext.Session.GetString("userId")))
+                .Where(x => x.Author.Username.Equals(username))
                 .Select(x => new ArticleViewModel()
                 {
                     Id = x.Id,
@@ -44,7 +47,7 @@ namespace MVC_BlogProject.Controllers
                     ArticlePicture = x.ArticlePicture,
                     Title = x.Title,
                     Content = x.Content,
-                    // todo CreatedTime Eklenecek.
+                    CreatedTime = x.CreatedTime
                 }).ToList();
             return View(list);
         }

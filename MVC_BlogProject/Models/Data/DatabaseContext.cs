@@ -25,6 +25,8 @@ namespace MVC_BlogProject.Models.Data
             modelBuilder.Entity<User>().HasData(
                 new User() { Id = 1, Username = "kagan", Password = "1234" }
             );
+
+            modelBuilder.Entity<Article>().Property(x => x.CreatedTime).HasDefaultValueSql("getutcdate()");
         }
     }
 }

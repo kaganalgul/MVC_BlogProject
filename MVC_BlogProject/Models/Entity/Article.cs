@@ -22,6 +22,9 @@ namespace MVC_BlogProject.Models.Entity
 
         public string ArticlePicture { get; set; }
 
+        [Required]
+        public DateTime CreatedTime { get; set; } = DateTime.Now;
+
         [ForeignKey("Author")]
         public int AuthorId { get; set; }
         [Required]

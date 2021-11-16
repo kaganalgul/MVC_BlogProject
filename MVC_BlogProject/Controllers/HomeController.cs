@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MVC_BlogProject.Filters;
 using MVC_BlogProject.Models;
 using MVC_BlogProject.Models.Data;
+using MVC_BlogProject.Models.Entity;
 using MVC_BlogProject.ViewModels.Home.Profile;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,21 @@ namespace MVC_BlogProject.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            List<ArticleViewModel> list =
+                _db.Articles
+                .Take(20)
+                .Select(x => new ArticleViewModel()
+                {
+                    Id = x.Id,
+                    AuthorId = x.AuthorId.ToString(),
+                    AuthorName = x.Author.Username,
+                    ArticlePicture = string.IsNullOrEmpty(x.ArticlePicture) ? "null.png" : x.ArticlePicture,
+                    Title = x.Title,
+                    Content = x.Content,
+                    CreatedTime = x.CreatedTime
+                }).ToList();
+
+            return View(list);
         }
 
         [LoggedUser]
@@ -44,14 +59,13 @@ namespace MVC_BlogProject.Controllers
                     Id = x.Id,
                     AuthorId = x.AuthorId.ToString(),
                     AuthorName = x.Author.Username,
-                    ArticlePicture = x.ArticlePicture,
+                    ArticlePicture = string.IsNullOrEmpty(x.ArticlePicture) ? "null.png" : x.ArticlePicture,
                     Title = x.Title,
                     Content = x.Content,
                     CreatedTime = x.CreatedTime
                 }).ToList();
             return View(list);
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
